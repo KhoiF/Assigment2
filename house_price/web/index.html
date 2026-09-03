@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dự đoán Giá nhà AI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    
+    :root { 
+        color-scheme: light; 
+        --primary: #c29b62; /* Elegant gold */
+        --primary-hover: #a37c43;
+        --bg-main: #f9f8f6;
+        --surface: #ffffff;
+        --text-main: #2c2a29;
+        --text-muted: #737373;
+        --border-color: #e5e5e5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      color: var(--text-main);
+      background: var(--bg-main);
+      background-image: radial-gradient(#e2dfd8 1px, transparent 1px);
+      background-size: 32px 32px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    main {
+      width: min(100%, 720px);
+      padding: 56px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px; /* Sharper corners for a premium feel */
+      background: var(--surface);
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+    main::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 6px;
+        background: linear-gradient(90deg, #c29b62, #e5c99f);
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+    h1 { 
+        margin: 0 0 16px; 
+        font-family: 'Playfair Display', serif; 
+        font-size: 42px; 
+        font-weight: 700; 
+        color: #1a1a1a; 
+        text-align: center; 
+    }
+    .intro { margin: 0 0 48px; color: var(--text-muted); line-height: 1.7; text-align: center; font-size: 16px; }
+    
+    .grid-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+    .field { margin-bottom: 0; }
+    .field.full-width { grid-column: 1 / -1; }
+
+    label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: #4a4a4a; text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select {
+      width: 100%; padding: 16px;
+      border: 1px solid var(--border-color); border-radius: 4px;
+      font-size: 16px; background: #fafafa;
+      transition: all 0.2s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #1a1a1a;
+    }
+    input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(194, 155, 98, 0.1);
+    }
+    
+    button {
+      width: 100%; padding: 20px; margin-top: 32px; grid-column: 1 / -1;
+      border: none; border-radius: 4px;
+      background: #1a1a1a; color: #fff; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    button:hover { background: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(194, 155, 98, 0.2); }
+    button:disabled { background: #e5e5e5; color: #a3a3a3; cursor: wait; transform: none; box-shadow: none; }
+    
+    #result {
+      display: none; margin-top: 48px; padding: 32px; border-radius: 4px;
+      line-height: 1.6; animation: fadeScale 0.4s ease;
+      text-align: center; background: #fdfbf7; border: 1px solid #f2eadc;
+    }
+    @keyframes fadeScale {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    #result.success h3 { color: var(--primary); font-family: 'Playfair Display', serif; font-size: 32px; margin: 0 0 12px; font-weight: 700; }
+    #result.error { background: #fff5f5; border-color: #fee2e2; }
+    #result.error h3 { color: #dc2626; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; margin: 0 0 8px; }
+    
+    .note { margin: 40px 0 0; color: #a3a3a3; font-size: 12px; line-height: 1.6; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    @media (max-width: 600px) {
+      body { padding: 16px; background-size: 24px 24px; }
+      main { padding: 32px 24px; width: 100%; }
+      .grid-form { grid-template-columns: 1fr; gap: 20px; }
+      h1 { font-size: 32px; }
+      .intro { font-size: 15px; margin-bottom: 32px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AI Định Giá Bất Động Sản</h1>
+    <p class="intro">Nhập thông tin mô tả chi tiết của căn nhà để hệ thống dự báo mức giá phù hợp trên thị trường.</p>
+    
+    <form id="prediction-form" class="grid-form">
+      <!-- Model Selection -->
+      <div class="field full-width">
+        <label for="model">Mô hình AI dự đoán (Model)</label>
+        <select id="model" required>
+          {% for model_id, config in model_options.items() %}
+          <option value="{{ model_id }}" {% if model_id == 'decision_tree' %}selected{% endif %}>{{ config.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Numeric Features -->
+      <div class="field">
+        <label for="floors">Số tầng (Floors)</label>
+        <input id="floors" type="number" step="1" required placeholder="VD: 3" value="3">
+      </div>
+      <div class="field">
+        <label for="bedrooms">Số phòng ngủ (Bedrooms)</label>
+        <input id="bedrooms" type="number" step="1" required placeholder="VD: 4" value="4">
+      </div>
+      <div class="field">
+        <label for="bathrooms">Số phòng vệ sinh (Bathrooms)</label>
+        <input id="bathrooms" type="number" step="1" required placeholder="VD: 3" value="3">
+      </div>
+      
+      <!-- Categorical Features -->
+      <div class="field">
+        <label for="legal-status">Tình trạng pháp lý (Legal status)</label>
+        <select id="legal-status" required>
+            <option value="Have certificate">Đã có sổ đỏ / chứng nhận</option>
+            <option value="Sale contract">Hợp đồng mua bán</option>
+            <option value="Unknown" selected>Không rõ</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="furniture-state">Nội thất (Furniture state)</label>
+        <select id="furniture-state" required>
+            <option value="Full">Nội thất đầy đủ (Full)</option>
+            <option value="Basic">Cơ bản (Basic)</option>
+            <option value="Unknown" selected>Không rõ</option>
+        </select>
+      </div>
+
+      <button type="submit" id="submit-button">Định giá ngay</button>
+    </form>
+    
+    <section id="result" aria-live="polite"></section>
+    
+    <p class="note">Mức giá trên chỉ mang tính chất dự báo dựa trên dữ liệu lịch sử và không đại diện cho thẩm định giá chính thức.</p>
+  </main>
+
+  <script>
+    const form = document.querySelector('#prediction-form');
+    const button = document.querySelector('#submit-button');
+    const result = document.querySelector('#result');
+
+    const escapeHtml = (value) => String(value || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      button.textContent = 'Hệ thống đang tính toán...';
+      
+      result.className = '';
+      result.style.display = 'none';
+
+      const payload = {
+        model: document.querySelector('#model').value,
+        Floors: Number(document.querySelector('#floors').value),
+        Bedrooms: Number(document.querySelector('#bedrooms').value),
+        Bathrooms: Number(document.querySelector('#bathrooms').value),
+        'Legal status': document.querySelector('#legal-status').value,
+        'Furniture state': document.querySelector('#furniture-state').value
+      };
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Lỗi kết nối đến máy chủ dự đoán.');
+        }
+        
+        result.className = 'success';
+        
+        const price = data.price;
+        const formattedPrice = price.toLocaleString('vi-VN');
+        
+        result.innerHTML = `
+            <h3>Dự báo: ${formattedPrice} Tỷ VNĐ</h3>
+            <p style="margin:6px 0 0; font-size: 15px; color: #166534;">
+                Model áp dụng: <strong>${escapeHtml(data.model_label)}</strong>
+            </p>
+        `;
+        
+      } catch (error) {
+        result.className = 'error';
+        result.innerHTML = `<h3>Lỗi Hệ Thống</h3><p style="margin:0;">${escapeHtml(error.message)}</p>`;
+      } finally {
+        result.style.display = 'block';
+        button.disabled = false;
+        button.textContent = 'Định giá ngay';
+      }
+    });
+  </script>
+</body>
+</html>
