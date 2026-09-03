@@ -8,14 +8,14 @@
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
     
     :root { 
-        color-scheme: dark; 
-        --primary: #0ea5e9;
-        --primary-hover: #0284c7;
-        --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-        --surface: rgba(255, 255, 255, 0.03);
-        --surface-border: rgba(255, 255, 255, 0.08);
-        --text-main: #f8fafc;
-        --text-muted: #94a3b8;
+        color-scheme: light; 
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #ede9fe 100%);
+        --surface: rgba(255, 255, 255, 0.7);
+        --surface-border: rgba(255, 255, 255, 0.4);
+        --text-main: #0f172a;
+        --text-muted: #475569;
     }
     * { box-sizing: border-box; }
     body {
@@ -35,15 +35,15 @@
       border-radius: 28px;
       background: var(--surface);
       backdrop-filter: blur(24px);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     main:hover {
         transform: translateY(-4px);
     }
-    h1 { margin: 0 0 12px; font-size: 36px; font-weight: 700; color: #fff; text-align: center; letter-spacing: -0.5px; 
-         background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .intro { margin: 0 0 40px; color: var(--text-muted); line-height: 1.6; text-align: center; font-size: 16px; font-weight: 300; }
+    h1 { margin: 0 0 12px; font-size: 36px; font-weight: 700; color: #1e293b; text-align: center; letter-spacing: -0.5px; 
+         background: linear-gradient(to right, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .intro { margin: 0 0 40px; color: var(--text-muted); line-height: 1.6; text-align: center; font-size: 16px; font-weight: 400; }
     
     .grid-form {
         display: grid;
@@ -53,37 +53,38 @@
     .field { margin-bottom: 4px; }
     .field.full-width { grid-column: 1 / -1; }
 
-    label { display: block; margin-bottom: 10px; font-weight: 500; font-size: 14px; color: #cbd5e1; letter-spacing: 0.3px; }
+    label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px; color: #334155; letter-spacing: 0.3px; }
     input, select {
       width: 100%; padding: 16px 20px;
-      border: 1px solid var(--surface-border); border-radius: 16px;
-      font-size: 15px; background: rgba(0, 0, 0, 0.2); color: #fff;
+      border: 1px solid rgba(0,0,0,0.1); border-radius: 16px;
+      font-size: 15px; background: rgba(255, 255, 255, 0.9); color: #0f172a;
       transition: all 0.3s ease;
       font-family: 'Outfit', sans-serif;
     }
-    input::placeholder { color: #475569; }
+    input::placeholder { color: #94a3b8; }
     input:focus, select:focus {
         outline: none;
         border-color: var(--primary);
-        background: rgba(0, 0, 0, 0.4);
-        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     }
-    select option { background: #1e293b; color: #fff; }
+    select option { background: #ffffff; color: #0f172a; }
     
     button {
       width: 100%; padding: 18px; margin-top: 24px; grid-column: 1 / -1;
       border: none; border-radius: 16px;
-      background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; font-size: 17px; font-weight: 600;
+      background: linear-gradient(135deg, #3b82f6, #6366f1); color: #fff; font-size: 17px; font-weight: 600;
       cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.5px;
       box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
     }
-    button:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4); filter: brightness(1.1); }
-    button:disabled { background: #334155; cursor: not-allowed; transform: none; box-shadow: none; color: #94a3b8; filter: none; }
+    button:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4); filter: brightness(1.05); }
+    button:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; color: #64748b; filter: none; }
     
     #result {
       display: none; margin-top: 40px; padding: 28px; border-radius: 20px;
       line-height: 1.6; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       text-align: center; position: relative; overflow: hidden;
+      background: #ffffff;
     }
     @keyframes slideUp {
         from { opacity: 0; transform: translateY(20px); }
@@ -92,55 +93,65 @@
     #result::before {
         content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
     }
-    #result.positive { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); }
+    
+    /* Diabetes specific result styles */
+    #result.positive { background: #fef2f2; border: 1px solid #fee2e2; }
     #result.positive::before { background: #ef4444; }
-    #result.positive h3 { color: #fca5a5; }
+    #result.positive h3 { color: #b91c1c; }
     
-    #result.negative { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.2); }
+    #result.negative { background: #f0fdf4; border: 1px solid #dcfce7; }
     #result.negative::before { background: #22c55e; }
-    #result.negative h3 { color: #86efac; }
+    #result.negative h3 { color: #15803d; }
     
-    #result.error { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); }
+    /* House Price specific result styles */
+    #result.success { background: #f0fdf4; border: 1px solid #dcfce7; }
+    #result.success::before { background: #22c55e; }
+    #result.success h3 { color: #15803d; font-size: 32px; margin: 0 0 12px; font-weight: 700; background: linear-gradient(to right, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    /* Common error styles */
+    #result.error { background: #fffbeb; border: 1px solid #fef3c7; }
     #result.error::before { background: #f59e0b; }
-    #result.error h3 { color: #fcd34d; }
+    #result.error h3 { color: #b45309; }
     
     #result h3 { font-size: 22px; margin: 0 0 12px; font-weight: 700; letter-spacing: -0.3px; }
     
+    /* Diabetes Knowledge Graph styles */
     #knowledge {
       display: none; margin-top: 32px;
     }
     #knowledge.visible { display: block; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
     .knowledge-group { margin-bottom: 32px; }
     .knowledge-group h2 { 
-        font-size: 20px; margin-bottom: 20px; color: #fff; font-weight: 600;
+        font-size: 20px; margin-bottom: 20px; color: #1e293b; font-weight: 700;
         display: flex; align-items: center; gap: 12px;
     }
     .knowledge-group h2::before {
-        content: ''; display: block; width: 6px; height: 20px; background: #38bdf8; border-radius: 4px;
+        content: ''; display: block; width: 6px; height: 20px; background: #3b82f6; border-radius: 4px;
     }
     .knowledge-card {
       margin-bottom: 20px; padding: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px;
-      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 20px;
+      background: rgba(255, 255, 255, 0.8);
       transition: all 0.3s ease;
     }
     .knowledge-card:hover { 
-        background: rgba(255, 255, 255, 0.04);
-        border-color: rgba(255, 255, 255, 0.1);
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, 0.1);
         transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    .knowledge-card h3 { margin: 0 0 12px; font-size: 17px; color: #e2e8f0; font-weight: 600; }
-    .knowledge-card p { margin: 0 0 16px; color: #cbd5e1; line-height: 1.7; font-size: 15px; font-weight: 300; }
-    .knowledge-card ul { margin: 16px 0 0; padding-left: 20px; font-size: 14px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px; }
-    .knowledge-card a { color: #38bdf8; text-decoration: none; font-weight: 500; transition: color 0.2s; }
-    .knowledge-card a:hover { color: #7dd3fc; text-decoration: underline; }
+    .knowledge-card h3 { margin: 0 0 12px; font-size: 17px; color: #1e293b; font-weight: 700; }
+    .knowledge-card p { margin: 0 0 16px; color: #475569; line-height: 1.7; font-size: 15px; font-weight: 400; }
+    .knowledge-card ul { margin: 16px 0 0; padding-left: 20px; font-size: 14px; color: #64748b; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 16px; }
+    .knowledge-card a { color: #2563eb; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+    .knowledge-card a:hover { color: #1d4ed8; text-decoration: underline; }
     
     .badge {
-        display: inline-block; padding: 6px 12px; background: rgba(14, 165, 233, 0.15); color: #7dd3fc; 
-        border-radius: 24px; font-size: 12px; font-weight: 600; margin-bottom: 16px; border: 1px solid rgba(14, 165, 233, 0.2);
+        display: inline-block; padding: 6px 12px; background: #eff6ff; color: #2563eb; 
+        border-radius: 24px; font-size: 12px; font-weight: 600; margin-bottom: 16px; border: 1px solid #bfdbfe;
     }
 
-    .note { margin: 40px 0 0; color: #64748b; font-size: 13px; line-height: 1.6; text-align: center; }
+    .note { margin: 40px 0 0; color: #94a3b8; font-size: 13px; line-height: 1.6; text-align: center; }
 
     @media (max-width: 600px) {
       body { padding: 16px; }

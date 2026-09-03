@@ -10,10 +10,10 @@ app = Flask(__name__)
 
 # --- Models ---
 MODEL_OPTIONS = {
-    'knn': {'label': 'K-Nearest Neighbors', 'filename': 'knn.sav'},
-    'logistic_regression': {'label': 'Logistic Regression', 'filename': 'logistic_regression.sav'},
-    'linear_svm': {'label': 'SVM Linear Kernel', 'filename': 'linear_svm.sav'},
-    'rbf_svm': {'label': 'SVM RBF Kernel', 'filename': 'rbf_svm.sav'}
+    'knn': {'label': 'K-Nearest Neighbors', 'filename': 'model/knn.sav'},
+    'logistic_regression': {'label': 'Logistic Regression', 'filename': 'model/logistic_regression.sav'},
+    'linear_svm': {'label': 'SVM Linear Kernel', 'filename': 'model/linear_svm.sav'},
+    'rbf_svm': {'label': 'SVM RBF Kernel', 'filename': 'model/rbf_svm.sav'}
 }
 
 loaded_models = {}

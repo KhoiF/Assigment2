@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dự đoán khuyến nghị sản phẩm</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+      
+      :root { 
+          color-scheme: light; 
+          --primary: #3b82f6;
+          --primary-hover: #2563eb;
+          --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #ede9fe 100%);
+          --surface: rgba(255, 255, 255, 0.7);
+          --surface-border: rgba(255, 255, 255, 0.4);
+          --text-main: #0f172a;
+          --text-muted: #475569;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        color: var(--text-main);
+        background: var(--bg-gradient);
+        font-family: 'Outfit', sans-serif;
+      }
+      main {
+        width: min(100%, 680px);
+        padding: 48px;
+        border: 1px solid var(--surface-border);
+        border-radius: 28px;
+        background: var(--surface);
+        backdrop-filter: blur(24px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      main:hover {
+          transform: translateY(-4px);
+      }
+      h1 { margin: 0 0 12px; font-size: 36px; font-weight: 700; color: #1e293b; text-align: center; letter-spacing: -0.5px; 
+           background: linear-gradient(to right, #2563eb, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .intro { margin: 0 0 40px; color: var(--text-muted); line-height: 1.6; text-align: center; font-size: 16px; font-weight: 400; }
+      
+      .grid-form {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+      }
+      .field { margin-bottom: 4px; }
+      .field.full-width { grid-column: 1 / -1; }
+
+      label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px; color: #334155; letter-spacing: 0.3px; }
+      input, select, textarea {
+        width: 100%; padding: 16px 20px;
+        border: 1px solid rgba(0,0,0,0.1); border-radius: 16px;
+        font-size: 15px; background: rgba(255, 255, 255, 0.9); color: #0f172a;
+        transition: all 0.3s ease;
+        font-family: 'Outfit', sans-serif;
+      }
+      textarea { min-height: 120px; resize: vertical; }
+      input::placeholder, textarea::placeholder { color: #94a3b8; }
+      input:focus, select:focus, textarea:focus {
+          outline: none;
+          border-color: var(--primary);
+          background: #ffffff;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      }
+      select option { background: #ffffff; color: #0f172a; }
+      
+      button {
+        width: 100%; padding: 18px; margin-top: 24px; grid-column: 1 / -1;
+        border: none; border-radius: 16px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1); color: #fff; font-size: 17px; font-weight: 600;
+        cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.5px;
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+      }
+      button:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4); filter: brightness(1.05); }
+      button:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; color: #64748b; filter: none; }
+      
+      #result {
+        display: none; margin-top: 40px; padding: 28px; border-radius: 20px;
+        line-height: 1.6; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        text-align: center; position: relative; overflow: hidden;
+        background: #ffffff;
+      }
+      @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+      }
+      #result::before {
+          content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+      }
+      
+      /* Specific result styles */
+      #result.positive { background: #f0fdf4; border: 1px solid #dcfce7; }
+      #result.positive::before { background: #22c55e; }
+      #result.positive .result-title { color: #15803d; font-size: 26px; font-weight: 700; margin-bottom: 12px; }
+      
+      #result.negative { background: #fef2f2; border: 1px solid #fee2e2; }
+      #result.negative::before { background: #ef4444; }
+      #result.negative .result-title { color: #b91c1c; font-size: 26px; font-weight: 700; margin-bottom: 12px; }
+      
+      /* Common error styles */
+      #result.error { background: #fffbeb; border: 1px solid #fef3c7; }
+      #result.error::before { background: #f59e0b; }
+      #result.error .result-title { color: #b45309; font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+      
+      .muted { margin: 12px 0 0; color: #64748b; font-size: 14px; }
+      .detail { font-size: 15px; margin-bottom: 6px; }
+
+      @media (max-width: 600px) {
+        body { padding: 16px; }
+        main { padding: 32px 20px; width: 100%; border-radius: 24px; }
+        .grid-form { grid-template-columns: 1fr; gap: 16px; }
+        h1 { font-size: 28px; }
+        .intro { font-size: 15px; margin-bottom: 32px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Dự đoán hành vi khuyến nghị</h1>
+      <p class="intro">Nhập tiêu đề và nội dung review. Hệ thống phân loại review có khả năng khuyến nghị sản phẩm hay không.</p>
+      
+      <form id="prediction-form" class="grid-form">
+        <!-- Model Selection -->
+        <div class="field full-width">
+          <label>Mô hình AI dự đoán (Model)</label>
+          <select name="model" required>
+            <option value="logistic_regression">Logistic Regression (khuyến nghị)</option>
+            <option value="multinomial_naive_bayes">Multinomial Naive Bayes</option>
+            <option value="sgd_classifier">SGD Classifier</option>
+            <option value="linear_svm">Linear SVM</option>
+            <option value="random_forest">Random Forest</option>
+            <option value="decision_tree">Decision Tree</option>
+          </select>
+        </div>
+
+        <div class="field full-width">
+          <label>Tiêu đề review (không bắt buộc)</label>
+          <input name="Title" type="text" placeholder="Ví dụ: Very comfortable dress">
+        </div>
+        
+        <div class="field full-width">
+          <label>Nội dung review</label>
+          <textarea name="Review Text" required placeholder="Nhập nội dung review bằng tiếng Anh..."></textarea>
+        </div>
+
+        <button type="submit" id="submit-button">Phân loại review</button>
+      </form>
+      
+      <section id="result" aria-live="polite"></section>
+    </main>
+    <script>
+      const form = document.querySelector("#prediction-form");
+      const result = document.querySelector("#result");
+      const button = form.querySelector("button");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const data = Object.fromEntries(new FormData(form));
+        button.disabled = true;
+        button.textContent = "Hệ thống đang phân tích...";
+        
+        result.style.display = "none";
+        result.className = "";
+        
+        try {
+          const response = await fetch("/recommendation/v1/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+          const body = await response.json();
+          if (!response.ok) throw new Error(body.error || "Không thể phân loại review.");
+
+          const confidence = body.recommendation_probability === null
+            ? "Không có (model không hỗ trợ xác suất)"
+            : body.recommendation_probability.toFixed(2) + "%";
+            
+          result.className = body.result_level; // positive or negative
+          
+          result.innerHTML = 
+            "<div class='result-title'>" + body.recommendation + "</div>" +
+            "<div class='detail'><strong>Mô hình:</strong> " + body.model_label + "</div>" +
+            "<div class='detail'><strong>Xác suất khuyến nghị:</strong> " + confidence + "</div>" +
+            "<div class='muted'>" + body.message + "</div>";
+            
+        } catch (error) {
+          result.className = "error";
+          result.innerHTML = "<div class='result-title'>Lỗi Hệ Thống</div><div class='detail'>" + error.message + "</div>";
+        } finally {
+          result.style.display = "block";
+          button.disabled = false;
+          button.textContent = "Phân loại review";
+        }
+      });
+    </script>
+  </body>
+</html>
